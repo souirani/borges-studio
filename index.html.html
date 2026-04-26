@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Calendário Editorial — Studio Borges</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0e0b0f;
+    --surface: #161218;
+    --surface2: #1d1820;
+    --border: #2a2230;
+    --border2: #352840;
+    --gold: #c9a96e;
+    --gold-light: #e8cfa0;
+    --gold-dim: #8a6d44;
+    --white: #f0ece8;
+    --muted: #7a6e7c;
+    --muted2: #5a5060;
+    --tag-cilios-bg: #1e1028; --tag-cilios: #c9a0f0;
+    --tag-rel-bg: #0f1828; --tag-rel: #90b8f0;
+    --tag-aut-bg: #0f2018; --tag-aut: #90d8b0;
+    --tag-svc-bg: #1e1410; --tag-svc: #e8b880;
+    --tag-bast-bg: #181818; --tag-bast: #c8c0a0;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--white); font-family: 'DM Sans', sans-serif; font-weight: 300; line-height: 1.7; min-height: 100vh; }
+  .page-header { padding: 3rem 2rem 2rem; border-bottom: 0.5px solid var(--border); max-width: 900px; margin: 0 auto; }
+  .eyebrow { font-size: 11px; letter-spacing: 0.2em; color: var(--gold-dim); text-transform: uppercase; margin-bottom: 0.75rem; }
+  h1 { font-family: 'Cormorant Garamond', serif; font-size: 2.4rem; font-weight: 300; color: var(--white); line-height: 1.2; margin-bottom: 0.5rem; }
+  h1 span { color: var(--gold); font-style: italic; }
+  .subtitle { font-size: 13px; color: var(--muted); margin-bottom: 2rem; }
+  .legend { display: flex; flex-wrap: wrap; gap: 8px; }
+  .tag { font-size: 10px; letter-spacing: 0.08em; padding: 3px 10px; border-radius: 20px; font-weight: 400; }
+  .tag-cilios { background: var(--tag-cilios-bg); color: var(--tag-cilios); }
+  .tag-rel { background: var(--tag-rel-bg); color: var(--tag-rel); }
+  .tag-aut { background: var(--tag-aut-bg); color: var(--tag-aut); }
+  .tag-svc { background: var(--tag-svc-bg); color: var(--tag-svc); }
+  .tag-bast { background: var(--tag-bast-bg); color: var(--tag-bast); }
+  .main { max-width: 900px; margin: 0 auto; padding: 2rem; display: flex; flex-direction: column; gap: 12px; }
+  .post-card { background: var(--surface); border: 0.5px solid var(--border); border-radius: 12px; overflow: hidden; transition: border-color 0.2s; }
+  .post-card:hover { border-color: var(--border2); }
+  .post-header { display: grid; grid-template-columns: 40px 90px 1fr auto auto auto; align-items: center; gap: 12px; padding: 16px 20px; cursor: pointer; user-select: none; }
+  .post-num { font-family: 'Cormorant Garamond', serif; font-size: 1.4rem; font-weight: 300; color: var(--gold-dim); font-style: italic; }
+  .post-date { font-size: 11px; color: var(--muted); letter-spacing: 0.05em; }
+  .post-title { font-size: 14px; font-weight: 400; color: var(--white); }
+  .format-pill { font-size: 10px; padding: 2px 9px; border-radius: 20px; background: var(--surface2); color: var(--muted); border: 0.5px solid var(--border); white-space: nowrap; }
+  .toggle-btn { font-size: 11px; color: var(--muted2); transition: color 0.2s; min-width: 16px; text-align: right; }
+  .post-header:hover .toggle-btn { color: var(--gold-dim); }
+  .post-body { display: none; border-top: 0.5px solid var(--border); padding: 20px; flex-direction: column; gap: 16px; }
+  .post-body.open { display: flex; }
+  .sections-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .section-block { background: var(--surface2); border: 0.5px solid var(--border); border-radius: 8px; padding: 14px 16px; }
+  .section-block.full { grid-column: 1 / -1; }
+  .section-label { font-size: 9px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--gold-dim); margin-bottom: 10px; display: flex; align-items: center; gap: 6px; }
+  .section-label::after { content: ''; flex: 1; height: 0.5px; background: var(--border); }
+  .section-text { font-size: 13px; color: #b0a8b8; line-height: 1.8; white-space: pre-wrap; }
+  .section-text b { color: var(--white); font-weight: 500; }
+  .legenda-block { background: #100d12; border: 0.5px solid var(--border2); border-left: 2px solid var(--gold-dim); border-radius: 8px; padding: 16px 18px; font-size: 13.5px; color: #d0c8d8; line-height: 1.9; white-space: pre-wrap; }
+  .script-block { background: #0d1018; border: 0.5px solid #1e2830; border-left: 2px solid #4a7aa0; border-radius: 8px; padding: 16px 18px; font-size: 13px; color: #a8c0d0; line-height: 1.85; white-space: pre-wrap; }
+  @media (max-width: 640px) {
+    .sections-grid { grid-template-columns: 1fr; }
+    .post-header { grid-template-columns: 32px 1fr auto auto; }
+    .post-date { display: none; }
+    .format-pill { display: none; }
+    h1 { font-size: 1.8rem; }
+  }
+</style>
+</head>
+<body>
+<div class="page-header">
+  <p class="eyebrow">Studio Borges &middot; @kayllaneborgesdesin &middot; Mês 1</p>
+  <h1>Calendário <span>editorial</span> completo</h1>
+  <p class="subtitle">12 posts de feed com objetivo, orientações de produção, roteiro e legenda pronta. Clique em cada post para expandir.</p>
+  <div class="legend">
+    <span class="tag tag-cilios">Cílios</span>
+    <span class="tag tag-rel">Relacionamento</span>
+    <span class="tag tag-aut">Autoridade</span>
+    <span class="tag tag-svc">Serviços</span>
+    <span class="tag tag-bast">Bastidores</span>
+  </div>
+</div>
+<div class="main" id="main"></div>
+<script>
+const posts = [
+  {
+    num:"01", date:"Dia 02 · seg", title:"Apresentação da Kayllane", formato:"Foto", tag:"tag-rel", tagLabel:"Relacionamento",
+    objetivo:"Criar o primeiro ponto de conexão com quem ainda não te conhece. Esse post precisa mostrar quem você é antes de mostrar o que você faz. A pessoa que chega no seu perfil pela primeira vez precisa sentir que você é real, acolhedora e confiante.",
+    producao:`TIPO: Foto estática
+
+CENÁRIO: Studio arrumado ao fundo, maca visível mas sem bagunça. Kayllane posicionada levemente à frente, centralizada ou levemente deslocada pra um lado.
+
+EXPRESSÃO E POSTURA: Sorriso leve, não forçado. Olhar direto pra câmera. Postura ereta, mãos soltas — pode segurar um café ou apoiar no braço da cadeira.
+
+LUZ: Luz natural pela frente ou anel de luz difuso. Evitar sombra pesada no rosto.
+
+ROUPA: Uniforme ou roupa que ela usa no studio, no estilo dela. Nada muito informal.
+
+ÂNGULO: Câmera na altura dos olhos ou levemente acima. Retrato 4x5 — vertical, corte na cintura pra cima.`,
+    roteiro:null,
+    legenda:`Se você chegou aqui agora, deixa eu me apresentar.\n\nSou a Kayllane, especialista em extensão de cílios e sobrancelhas aqui em Feira de Santana. Trabalho sozinha, em espaço próprio, e é exatamente assim que eu gosto. Porque quando você chega aqui, toda a minha atenção é só sua.\n\nNão tem pressa, não tem distração. Tem cuidado de verdade, do começo ao fim.\n\nSe você ainda não me conhece, que bom que chegou até aqui. E se você já é cliente, sabe exatamente do que eu tô falando 🤍\n\nMe conta nos comentários: como você me encontrou?`
+  },
+  {
+    num:"02", date:"Dia 05 · qui", title:"Resultado de cílios — fio a fio", formato:"Foto", tag:"tag-cilios", tagLabel:"Cílios",
+    objetivo:"Mostrar a qualidade do trabalho com um resultado impactante. Esse post precisa fazer a pessoa parar o scroll e pensar 'eu quero isso'.",
+    producao:`TIPO: Foto estática
+
+CENÁRIO: Close no olho da cliente. Fundo neutro ou desfocado.
+
+ÂNGULO: Levemente de lado (45 graus) ou frontal com olho aberto e olhar levemente pra cima. Câmera bem próxima, focada nos cílios.
+
+LUZ: Boa nos cílios, sem reflexo excessivo na pele. Anel de luz funciona bem pra esse close.
+
+EXECUÇÃO: Tirar a foto antes da cliente sair da maca. Pedir pra ela abrir os olhos naturalmente, sem forçar. Pode tirar com o celular no modo retrato. Evitar flash direto.`,
+    roteiro:null,
+    legenda:`Esse olhar aqui saiu do studio hoje cedo e eu precisava mostrar pra vocês 🤍\n\nExtensão de cílios fio a fio, feita com calma e atenção em cada detalhe. Porque não tem como entregar um resultado assim com pressa.\n\nSe você ainda não experimentou, me manda uma mensagem. Tenho vagas essa semana e mal posso esperar pra te mostrar o que seus cílios são capazes de ser.\n\n👇 Link na bio pra agendar.`
+  },
+  {
+    num:"03", date:"Dia 08 · seg", title:"Mitos e verdades sobre extensão de cílios", formato:"Carrossel", tag:"tag-aut", tagLabel:"Autoridade",
+    objetivo:"Posicioná-la como especialista que educa, não só que vende. Conteúdo que salva e compartilha muito, ampliando o alcance orgânico.",
+    producao:`TIPO: Carrossel (7 slides)
+
+CAPA (slide 1): Fundo escuro no estilo da identidade visual. Título em destaque: "Mitos e verdades sobre extensão de cílios". Foto de resultado ao fundo com opacidade baixa.
+
+SLIDES DE CONTEÚDO (2 a 6): Um mito por slide. Estrutura: ícone ❌ + texto do mito → linha divisória → ícone ✓ + verdade. Layout limpo, sem excesso de texto.
+
+SLIDE FINAL (7): Foto da Kayllane + CTA: "Ficou com dúvida? Me chama no direct."
+
+PALETA: Fundo escuro, texto claro, detalhe em dourado. Consistente com a identidade visual.`,
+    roteiro:`SLIDE 1 — CAPA
+"Mitos e verdades sobre extensão de cílios"
+
+SLIDE 2
+❌ MITO: "Extensão de cílios cai o fio natural"
+✓ VERDADE: Quando feita com técnica correta e mapeamento adequado, a extensão não prejudica o fio natural. O que machuca é peso errado, cola de baixa qualidade ou profissional sem preparo.
+
+SLIDE 3
+❌ MITO: "Extensão dura só uma semana"
+✓ VERDADE: Com os cuidados certos, a extensão dura entre 21 e 30 dias. Oleosidade alta, dormir de bruço e produtos oleosos perto dos olhos encurtam esse prazo.
+
+SLIDE 4
+❌ MITO: "Não precisa de retoque se ainda tiver cílio"
+✓ VERDADE: O retoque em 21 dias existe pra manter o resultado uniforme e bonito. Deixar passar muito tempo exige mais fios e mais tempo de serviço.
+
+SLIDE 5
+❌ MITO: "Volume russo é pesado demais"
+✓ VERDADE: Volume russo bem aplicado, com espessura adequada pro fio natural, é leve e confortável. O desconforto acontece quando a técnica não respeita o fio da cliente.
+
+SLIDE 6
+❌ MITO: "Qualquer profissional entrega o mesmo resultado"
+✓ VERDADE: Técnica, materiais e atenção fazem toda a diferença no resultado e na saúde do seu fio natural.
+
+SLIDE 7 — ENCERRAMENTO
+[Foto da Kayllane]
+"Ficou com alguma dúvida? Me manda no direct, respondo todas 💬"
+@kayllaneborgesdesin`,
+    legenda:`Você já ouviu que extensão de cílios cai o cílio natural? Que estraga o olho? Que não dura nada?\n\nDeixa eu te contar a verdade de quem trabalha com isso todos os dias.\n\nDesliza pra ver o que é mito e o que é verdade de verdade sobre a extensão de cílios 👉\n\nTem alguma dúvida que você sempre quis tirar? Me manda nos comentários que eu respondo todas.`
+  },
+  {
+    num:"04", date:"Dia 10 · qua", title:"Bastidor do studio", formato:"Foto ou Reels curto", tag:"tag-bast", tagLabel:"Bastidores",
+    objetivo:"Criar desejo de estar naquele espaço. Mostrar o ambiente cria familiaridade e reduz a barreira de agendamento pra quem ainda não foi.",
+    producao:`TIPO: Foto estática OU Reels de 15 a 20 segundos
+
+SE FOR FOTO: Ambiente organizado, bancada com produtos alinhados, maca com lençol limpo. Ângulo amplo mostrando o espaço. Kayllane pode aparecer de costas ou de lado arrumando algo.
+
+SE FOR REELS — SEQUÊNCIA DE CENAS:
+  1. Porta do studio abrindo (câmera de dentro pra fora)
+  2. Bancada sendo organizada, produto por produto
+  3. Lençol sendo esticado na maca
+  4. Anel de luz sendo ligado
+  5. Kayllane olhando pro espaço pronto, sorrindo levemente
+
+ÁUDIO: Música calma, instrumental. Sem áudio trending que destoe do posicionamento sofisticado.
+
+TRANSIÇÃO: Cortes limpos, sem transição chamativa. A sofisticação está na calma das cenas.`,
+    roteiro:null,
+    legenda:`Esse é o espaço onde a mágica acontece todos os dias 🤍\n\nCada detalhe aqui foi pensado pra que você se sinta bem desde o momento que entra. Porque pra mim, a experiência começa muito antes de eu pegar nos seus cílios.\n\nVocê já veio me visitar aqui? Se ainda não veio, tô te esperando 📍 Feira de Santana, BA.`
+  },
+  {
+    num:"05", date:"Dia 13 · seg", title:"Depoimento de cliente", formato:"Print ou card visual", tag:"tag-rel", tagLabel:"Relacionamento",
+    objetivo:"Prova social. Deixar que outras clientes falem por ela. Alto poder de conversão porque valida o trabalho de forma externa.",
+    producao:`TIPO: Print de conversa de direct ou WhatsApp (com autorização) OU card criado com o depoimento
+
+OPÇÃO 1 — PRINT DIRETO: Recortar o print deixando apenas o texto relevante. Colocar fundo escuro ao redor pra combinar com a identidade visual. Adicionar @ no canto inferior.
+
+OPÇÃO 2 — CARD VISUAL: Fundo escuro. Aspas grandes em dourado. Texto do depoimento em fonte elegante. Primeiro nome da cliente (com autorização) e serviço feito. Logo do Studio Borges.
+
+DICA DE CAPTAÇÃO: No final de cada atendimento, Kayllane pode dizer: "Se você ficou satisfeita, pode me mandar uma mensagem depois com o que achou? Adoro guardar esses feedbacks." Isso cria um hábito natural de receber depoimentos sem parecer solicitação forçada.`,
+    roteiro:null,
+    legenda:`Receber um feedback assim é o que me faz querer fazer ainda melhor a cada atendimento 🤍\n\nNão existe recompensa maior do que saber que a cliente saiu daqui se sentindo bem, não só com o resultado, mas com toda a experiência.\n\nEsse é o tipo de relação que eu quero construir com cada pessoa que passa por aqui.\n\nSe você já foi atendida aqui no studio e quiser compartilhar sua experiência, me manda mensagem. Adoro saber como você se sentiu 💬`
+  },
+  {
+    num:"06", date:"Dia 15 · qua", title:"Rotina da Kayllane — lado humano", formato:"Foto ou Reels curto", tag:"tag-rel", tagLabel:"Relacionamento",
+    objetivo:"Humanizar o perfil mostrando ela fora do momento técnico. Posts assim criam identificação e aproximam a audiência da profissional.",
+    producao:`TIPO: Foto estática ou Reels de 15 a 20 segundos
+
+SE FOR FOTO: Ela tomando café no studio antes de começar, olhando pela janela ou sentada na cadeira com expressão tranquila. Luz natural se possível.
+
+SE FOR REELS — SEQUÊNCIA SUGERIDA:
+  Cena 1: Chegando no studio (chave na fechadura, porta abrindo)
+  Cena 2: Ligando a luz, acendendo o anel de luz
+  Cena 3: Preparando o café (chaleira, xícara, vapor)
+  Cena 4: Sentada com a xícara, olhando pro espaço em silêncio
+  Cena 5: Sorriso leve pra câmera
+
+NARRAÇÃO: Pode gravar em voz off enquanto as cenas passam (ver roteiro de fala abaixo)
+
+ÁUDIO: Voz dela em off OU áudio ambiente + música de fundo bem baixa`,
+    roteiro:`FALA SUGERIDA EM VOZ OFF OU STORIES PRÉVIOS:
+
+"Todo dia começo assim. Chego antes de todo mundo, abro o studio no meu ritmo, preparo um café e fico um pouco com esse silêncio antes de tudo começar.
+
+Tem gente que pergunta se não é difícil trabalhar sozinha. Pra mim, não é. É o contrário. É assim que consigo dar atenção de verdade pra cada cliente que entra aqui.
+
+Cada atendimento é uma pessoa. E essa pessoa merece que eu esteja inteira quando ela chegar."`,
+    legenda:`Todo dia começo assim. Café, studio e a cabeça já pensando nas clientes que chegam logo mais.\n\nTrabalhar sozinha é uma escolha que faço todos os dias porque acredito que é assim que consigo entregar o melhor. Com presença total, sem dividir atenção.\n\nCada cliente que entra aqui sabe que aquele momento é dela. Completamente.\n\nVocê já parou pra pensar no quanto um atendimento assim faz diferença? Me conta 💬`
+  },
+  {
+    num:"07", date:"Dia 17 · sex", title:"Resultado de sobrancelha", formato:"Antes e depois", tag:"tag-svc", tagLabel:"Serviços",
+    objetivo:"Ampliar a percepção dos serviços além dos cílios e mostrar a mão dela em sobrancelha.",
+    producao:`TIPO: Carrossel com antes e depois (2 a 3 slides)
+
+ANTES: Foto com boa iluminação, natural, sem edição excessiva. Mostrar como a sobrancelha estava de fato.
+
+DEPOIS: Mesmo ângulo, mesma luz. Foco na sobrancelha definida.
+
+ÂNGULO: Frontal levemente inclinado, mostrando os dois olhos com foco na sobrancelha. Câmera na altura do rosto.
+
+SLIDE EXTRA (opcional): Nome da técnica usada (design, brow lamination etc.) e uma linha curta sobre o que aquela técnica faz.
+
+DICA: Padronizar o ângulo das fotos de sobrancelha — sempre o mesmo — facilita a comparação e cria consistência visual no perfil ao longo do tempo.`,
+    roteiro:null,
+    legenda:`Sobrancelha no lugar certo muda tudo no rosto. Tudo mesmo.\n\nEsse resultado aqui saiu depois de um design cuidadoso, pensado no formato do rosto e no que a cliente precisava. Porque sobrancelha boa não é igual pra todo mundo, é a que combina com você.\n\nQuer saber qual técnica faz mais sentido pro seu tipo de sobrancelha? Me manda uma mensagem, adoro conversar sobre isso 🤍`
+  },
+  {
+    num:"08", date:"Dia 20 · seg", title:"Como escolher uma boa profissional de cílios", formato:"Carrossel educativo", tag:"tag-aut", tagLabel:"Autoridade",
+    objetivo:"Educar e ao mesmo tempo mostrar implicitamente que ela cumpre todos os critérios que cita. Alto potencial de salvar e compartilhar.",
+    producao:`TIPO: Carrossel (7 slides)
+
+CAPA: Fundo escuro. Título: "Antes de agendar extensão de cílios, lê isso." Fonte de destaque. Foto de resultado ao fundo com opacidade baixa.
+
+SLIDES DE CONTEÚDO: Um critério por slide. Título do critério em destaque + texto explicativo curto.
+
+SLIDE FINAL: Foto dela + "Esses são os critérios que sigo aqui no Studio Borges todos os dias." + CTA pra agendar.
+
+LAYOUT: Limpo, sem excesso de texto por slide. Menos é mais aqui.`,
+    roteiro:`SLIDE 1 — CAPA
+"Antes de agendar extensão de cílios, lê isso."
+
+SLIDE 2
+🔎 Observe o portfólio com cuidado
+Não basta ser bonito. Olha a consistência dos resultados, a qualidade das fotos e se o estilo combina com o que você quer.
+
+SLIDE 3
+🧼 Higiene é inegociável
+Produtos lacrados, aplicadores descartáveis, maca com lençol limpo. Se você não vê isso, desconfie.
+
+SLIDE 4
+💬 Uma boa especialista faz perguntas antes
+Ela quer saber do seu histórico, do seu fio natural e do que você espera. Não aplica o que você pede sem avaliar antes.
+
+SLIDE 5
+⏱ Pressa é sinal de atenção
+Extensão de qualidade leva tempo. Atendimento muito rápido pode indicar que atalhos foram tomados.
+
+SLIDE 6
+📍 Espaço fixo e estruturado
+Studio próprio ou sala fixa transmite mais segurança do que atendimento em qualquer lugar.
+
+SLIDE 7 — ENCERRAMENTO
+[Foto da Kayllane]
+"Esses são os critérios que eu sigo aqui no Studio Borges todos os dias."
+Link na bio pra agendar ou me chama no direct 💬`,
+    legenda:`Antes de marcar com qualquer profissional, você precisa saber disso.\n\nExtensão de cílios é um procedimento que pede técnica, higiene e atenção. E infelizmente nem todo perfil bonito no Instagram garante tudo isso.\n\nDesliza pra ver o que você deve observar antes de agendar 👉\n\nGuarda esse post pra consultar quando precisar e manda pra uma amiga que tá pensando em fazer extensão de cílios.`
+  },
+  {
+    num:"09", date:"Dia 22 · qua", title:"Resultado de limpeza de pele", formato:"Foto ou vídeo", tag:"tag-svc", tagLabel:"Serviços",
+    objetivo:"Ampliar o repertório de serviços percebidos pelo público e mostrar que além dos cílios, ela cuida da pele com o mesmo cuidado.",
+    producao:`TIPO: Foto de resultado OU vídeo curto do procedimento (com autorização)
+
+SE FOR FOTO: Pele da cliente antes e depois no mesmo ângulo e mesma luz. Close no rosto, foco na textura. Evitar filtro que altere a cor real da pele.
+
+SE FOR VÍDEO: Cenas curtas do procedimento — mãos da Kayllane aplicando produto, espátula sendo usada, cliente relaxada. Câmera estática ou com movimento suave.
+
+LUZ: Direta pra evidenciar a textura da pele. Anel de luz funciona bem.
+
+DICA IMPORTANTE: Esse post funciona melhor quando mostra a transformação real, sem filtro excessivo. Autenticidade conta mais do que perfeição técnica da foto.`,
+    roteiro:null,
+    legenda:`A pele também merece atenção e cuidado 🤍\n\nLimpeza de pele profunda aqui no studio, feita com calma e com os produtos certos pro seu tipo de pele. Porque cuidar da pele não é luxo, é necessidade.\n\nSe você ainda não fez a sua aqui comigo, me manda mensagem. Sua pele vai agradecer.`
+  },
+  {
+    num:"10", date:"Dia 25 · seg", title:"Bastidor de atendimento — o processo", formato:"Reels ou foto durante procedimento", tag:"tag-bast", tagLabel:"Bastidores",
+    objetivo:"Mostrar o nível de atenção e cuidado durante o atendimento. Gera confiança porque evidencia o processo real.",
+    producao:`TIPO: Reels de 20 a 30 segundos OU foto durante o procedimento (com autorização)
+
+SE FOR REELS — SEQUÊNCIA SUGERIDA:
+  Cena 1: Kayllane lavando as mãos (close nas mãos)
+  Cena 2: Organizando os materiais na bancada
+  Cena 3: Cliente deitada na maca, relaxada, olhos fechados
+  Cena 4: Close nas pinças e nos fios sendo aplicados (câmera de lado)
+  Cena 5: Close no cílio finalizado, olho aberto
+
+ÂNGULO DA APLICAÇÃO: Câmera posicionada de lado em suporte, mostrando as mãos dela e o olho da cliente. Não precisa mostrar o rosto inteiro da cliente.
+
+NARRAÇÃO OPCIONAL: Kayllane fala algo curto em voz off enquanto as cenas passam (ver roteiro abaixo).
+
+ÁUDIO: Música ambiente calma, sem letra. Pode usar um trending suave que não destoe do tom sofisticado.`,
+    roteiro:`FALA SUGERIDA EM VOZ OFF:
+
+"Aqui não tem pressa. Cada fio é colocado com atenção, um por um.
+
+Porque o resultado bonito é consequência disso: de cuidar de cada detalhe como se fosse o único que importa."
+
+(Duração aproximada: 8 a 10 segundos de fala. Pausas naturais entre as frases.)`,
+    legenda:`É aqui que acontece tudo.\n\nCada fio colocado com atenção, cada detalhe observado, cada minuto dedicado só pra você. Não existe atalho quando o assunto é qualidade.\n\nEsse é o comprometimento que você encontra toda vez que agenda aqui no studio 🤍\n\nTem alguma vaga essa semana, me chama pra a gente conversar sobre o que você precisa 💬`
+  },
+  {
+    num:"11", date:"Dia 27 · qua", title:"Por que trabalho sozinha — posicionamento", formato:"Foto ou Reels falando pra câmera", tag:"tag-aut", tagLabel:"Autoridade",
+    objetivo:"Transformar o 'trabalho sozinha' de característica em diferencial percebido. Diferenciar o Studio Borges pelo modelo de atendimento.",
+    producao:`TIPO: Foto estática OU Reels falando direto pra câmera
+
+SE FOR FOTO: Studio ao fundo, organizado. Kayllane centralizada, postura confiante com ombros abertos. Olhar firme, direto pra câmera. Enquadramento 4x5, corte na cintura. Pode ser sentada na cadeira do studio, braços apoiados. Luz frontal suave, fundo levemente escurecido pra dar destaque pra ela.
+
+SE FOR REELS: Ela fala direto pra câmera, sem enrolação. Câmera estática na altura dos olhos. Boa iluminação frontal. Corte limpo no começo e no fim. (Ver roteiro completo abaixo)`,
+    roteiro:`ROTEIRO PARA REELS — FALA DIRETA PRA CÂMERA:
+
+[Kayllane olha pra câmera, expressão tranquila e confiante]
+
+"Tem gente que acha estranho eu trabalhar sozinha."
+
+[pausa de 1 segundo]
+
+"Eu acho a melhor decisão que já tomei."
+
+[pausa]
+
+"Quando você agenda aqui, não tem fila. Não tem outra cliente te esperando do lado de fora. Não tem ninguém dividindo a minha atenção."
+
+[pausa]
+
+"Tem eu, com tudo que eu sei, pensando só em você durante o tempo inteiro do atendimento."
+
+[pausa — olha levemente pra baixo e volta pra câmera]
+
+"Isso é o Studio Borges. E é assim que eu escolho trabalhar todos os dias."
+
+[fim — corte limpo, sem CTA verbal, apenas texto na tela: "📲 link na bio pra agendar"]
+
+DURAÇÃO APROXIMADA: 25 a 35 segundos
+TOM: Tranquilo, seguro. Sem entonação exaltada. Como se estivesse contando pra uma amiga.`,
+    legenda:`Tem gente que acha estranho eu trabalhar sozinha. Eu acho a melhor decisão que já tomei.\n\nQuando você chega aqui, não tem fila, não tem pressa, não tem outra pessoa dividindo o espaço. Tem eu, com toda a minha atenção, meu cuidado e minha técnica direcionados só pra você.\n\nEu acredito que atendimento de qualidade começa antes mesmo de você deitar na maca. Começa no momento em que você me manda a primeira mensagem.\n\nEsse é o Studio Borges. E é assim que eu trabalho todos os dias 🤍`
+  },
+  {
+    num:"12", date:"Dia 30 · sex", title:"CTA de encerramento do mês", formato:"Foto de resultado ou foto dela sorrindo", tag:"tag-rel", tagLabel:"Relacionamento",
+    objetivo:"Converter quem acompanhou o mês mas ainda não agendou. Encerrar o ciclo com presença, calor e convite direto.",
+    producao:`TIPO: Foto estática
+
+OPÇÃO A: Resultado impactante de cílios — close no olho, que resuma a qualidade do mês.
+
+OPÇÃO B: Foto dela sorrindo, expressão acolhedora, no studio. Não precisa ser muito produzida, pode ser algo natural tirado durante a semana.
+
+DICA DE ESCOLHA: Esse post funciona melhor com calor humano. Resultado bonito chama atenção, mas rosto sorridente cria conexão. Como é o encerramento de um mês de construção de relacionamento, a Opção B tende a funcionar melhor.
+
+LEGENDA: Direto ao ponto. Esse é o post com o CTA mais explícito do mês.`,
+    roteiro:null,
+    legenda:`Se você passou esse mês me acompanhando aqui e ainda não marcou seu horário, esse post é pra você 🤍\n\nTenho vagas disponíveis e mal posso esperar pra te receber aqui no studio. Seja pra extensão de cílios, design de sobrancelha, micropigmentação ou limpeza de pele, você vai sair daqui diferente. E não só por fora.\n\nMe manda uma mensagem agora mesmo ou clica no link da bio pra agendar. Tô te esperando 💬`
+  }
+];
+
+const main = document.getElementById('main');
+posts.forEach((p, i) => {
+  const card = document.createElement('div');
+  card.className = 'post-card';
+  const hasRoteiro = p.roteiro !== null;
+  card.innerHTML = `
+    <div class="post-header" onclick="toggle(${i})">
+      <span class="post-num">${p.num}</span>
+      <span class="post-date">${p.date}</span>
+      <span class="post-title">${p.title}</span>
+      <span class="tag ${p.tag}">${p.tagLabel}</span>
+      <span class="format-pill">${p.formato}</span>
+      <span class="toggle-btn" id="btn-${i}">↓</span>
+    </div>
+    <div class="post-body" id="body-${i}">
+      <div class="sections-grid">
+        <div class="section-block">
+          <div class="section-label">Objetivo do post</div>
+          <div class="section-text">${p.objetivo}</div>
+        </div>
+        <div class="section-block">
+          <div class="section-label">Como produzir a foto / vídeo</div>
+          <div class="section-text">${p.producao}</div>
+        </div>
+        ${hasRoteiro ? `
+        <div class="section-block full">
+          <div class="section-label">Roteiro de conteúdo</div>
+          <div class="script-block">${p.roteiro}</div>
+        </div>` : ''}
+        <div class="section-block full">
+          <div class="section-label">Legenda pronta</div>
+          <div class="legenda-block">${p.legenda}</div>
+        </div>
+      </div>
+    </div>
+  `;
+  main.appendChild(card);
+});
+
+function toggle(i) {
+  const body = document.getElementById('body-' + i);
+  const btn = document.getElementById('btn-' + i);
+  const isOpen = body.classList.contains('open');
+  body.classList.toggle('open', !isOpen);
+  btn.textContent = isOpen ? '↓' : '↑';
+}
+</script>
+</body>
+</html>
